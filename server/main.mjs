@@ -3,13 +3,14 @@ import {readFile,stat} from 'node:fs/promises';
 import {resolve,dirname,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createReadStream} from 'node:fs';
+import {GenerationService,FileJournal} from './generation.mjs';
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const MIME={'.html':'text/html; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.ico':'image/x-icon'};
 export function createServer({root=ROOT,port=4173,host='127.0.0.1',apiHandler=null}={}){
   const server=http.createServer(async(req,res)=>{
     const reply=(status,value,type='application/json; charset=utf-8')=>{res.writeHead(status,{'Content-Type':type});res.end(type.startsWith('application/json')?JSON.stringify(value):value);};
     res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Cross-Origin-Resource-Policy','same-origin');
-    res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; media-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self' https://perchance.org");
+    res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; media-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self' https://perchance.org https://*.perchance.org");
     const hostname=String(req.headers.host||'').split(':')[0].toLowerCase();
     const allowed=new Set(['127.0.0.1','localhost',host]);
     if(!allowed.has(hostname))return reply(403,{error:'Host is not allowed. Bind explicitly for a trusted deployment.'});
@@ -17,6 +18,11 @@ export function createServer({root=ROOT,port=4173,host='127.0.0.1',apiHandler=nu
     try{
       const url=new URL(req.url,'http://localhost');
       if(apiHandler && await apiHandler(req,res,url))return;
+      if(url.pathname==='/integrations/perchance-host.js'&&req.method==='GET'){
+        const source=await readFile(resolve(root,'integrations/host.mjs'),'utf8');
+        res.setHeader('Cross-Origin-Resource-Policy','cross-origin');
+        return reply(200,'(()=>{\n'+source.replace(/^export /gm,'')+'\nglobalThis.EA3Host={installHost,perchancePlugins};\n})();','text/javascript; charset=utf-8');
+      }
       if(url.pathname==='/api/health')return reply(200,{ok:true,app:'EmberAdventures 3',version:'3.0.0-rc.1'});
       if(url.pathname==='/api/providers')return reply(200,{text:{demo:true,configured:!!process.env.TEXT_ENDPOINT},image:{upload:true,configured:!!process.env.IMAGE_ENDPOINT},secrets:'server-side only'});
       if(!['GET','HEAD'].includes(req.method))return reply(405,{error:'Method not allowed.'});
@@ -34,8 +40,11 @@ export function createServer({root=ROOT,port=4173,host='127.0.0.1',apiHandler=nu
 if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   const port=Number(process.env.PORT || 4173),host=process.env.HOST || '127.0.0.1';
   if(!Number.isInteger(port)||port<1||port>65535)throw new Error('PORT must be a valid TCP port.');
-  const server=createServer({port,host});
+  const journal=await new FileJournal(resolve(ROOT,'.runtime','generation')).open();
+  await journal.prune();
+  const generation=new GenerationService({env:process.env,journal,authorize:req=>['127.0.0.1','localhost','::1'].includes(host)&&process.env.PUBLIC_MODE!=='1'?'local':null});
+  const server=createServer({port,host,apiHandler:(req,res,url)=>generation.handle(req,res,url)});
   server.on('error',error=>{console.error(error.code==='EADDRINUSE'?`Port ${port} is already in use. Set PORT in .env or close the other instance.`:error.message);process.exitCode=1;});
   server.listen(port,host,()=>console.log(`EmberAdventures 3\nOpen http://${host}:${port}\nLocal saves live in your browser. Use Your data for backups.\nPress Ctrl+C to stop the service.`));
-  for(const signal of ['SIGTERM','SIGINT'])process.once(signal,()=>server.close(()=>process.exit(0)));
+  for(const signal of ['SIGTERM','SIGINT'])process.once(signal,()=>{generation.close();server.close(()=>process.exit(0));});
 }

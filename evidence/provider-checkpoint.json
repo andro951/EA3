@@ -1,0 +1,1 @@
+{"phase":"provider-transport","command":"npm test","node":"22.16.0","passed":52,"failed":0,"liveAI":false,"scope":"Local unit/integration fixtures; actual live providers require separate validation."}
