@@ -4,13 +4,16 @@
   "private": true,
   "type": "module",
   "description": "The familiar EmberAdventures, rebuilt with canonical history and an ember-and-black interface",
-  "engines": {"node": ">=22.16.0"},
+  "engines": {
+    "node": ">=22.16.0"
+  },
   "scripts": {
     "start": "node --env-file-if-exists=.env server/main.mjs",
-    "test": "node --test tests/*.test.mjs",
+    "test": "node tools/test.mjs",
     "test:ui": "python tools/ui_test.py",
     "test:performance": "node --max-old-space-size=512 tests/performance.mjs",
     "build": "node tools/build.mjs",
-    "check": "node tools/check.mjs"
+    "check": "node tools/check.mjs",
+    "test:release": "node tools/release_test.mjs"
   }
 }

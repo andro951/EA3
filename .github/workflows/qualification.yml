@@ -29,6 +29,11 @@ jobs:
           mkdir -p evidence
           set -o pipefail
           npm test 2>&1 | tee evidence/ci-unit-tests.log
+      - name: Source, performance and reproducible package checks
+        run: |
+          npm run check
+          npm run test:performance
+          npm run test:release
       - name: Install native browser test dependencies
         run: |
           python -m pip install playwright==1.57.0

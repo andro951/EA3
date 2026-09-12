@@ -1,0 +1,20 @@
+/** Bounded synthetic measurements; MemoryRepository is not native IndexedDB. */
+import {performance} from 'node:perf_hooks';
+import {writeFile,mkdir} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import {compile} from '../app/core/schema.mjs';
+import {createAdventure,planAction,commitAction,rewind} from '../app/core/engine.mjs';
+import {GraphIndex} from '../app/authoring/graph.mjs';
+import {MemoryRepository} from './support/memory-repository.mjs';
+import {starterStory,starterCharacters} from '../content/seed.mjs';
+const report={mode:'synthetic Node benchmark; explicit in-memory repository',node:process.version,limits:{heapMiB:512},measurements:{}};
+const timed=async(name,fn)=>{const t=performance.now(),value=await fn();report.measurements[name]=Math.round((performance.now()-t)*100)/100;return value;};
+const giant=structuredClone(starterStory);giant.id='synthetic-20000';giant.start='n0';giant.nodes=Array.from({length:20000},(_,i)=>({id:'n'+i,title:'Moment '+i,text:'A synthetic testing scene.',...(i<19999?{next:'n'+(i+1)}:{})}));
+const graph=await timed('index20000NodesMs',()=>new GraphIndex(giant));assert.equal(graph.nodes.size,20000);assert.equal(graph.search('Moment 19999').total,1);assert.ok(graph.visible({x:0,y:0,width:1440,height:900,zoom:.8}).nodes.length<=600);
+const compiled=compile(starterStory);let save=createAdventure(compiled,starterCharacters,{name:'Synthetic traveler',rating:'sfw'});
+await timed('commit2000CanonicalTurnsMs',()=>{for(let i=0;i<2000;i++)save=commitAction(save,planAction(compiled,save,{kind:'say',text:'Synthetic turn '+i}),{text:'A deterministic response with no model or network call.'});});assert.equal(save.events.length,2001);
+const cut=await timed('rewind1000TurnsMs',()=>rewind(save,1001));assert.equal(cut.events.length,1001);assert.equal(cut.state.clock,1000);
+const repo=new MemoryRepository();save.definitionKey=await repo.freeze(starterStory);await repo.commitSave(save);
+const archive=await timed('exportArchiveMs',()=>repo.exportArchive({saveId:save.id}));const other=new MemoryRepository();await timed('validateAndImportArchiveMs',()=>other.importArchive(archive));assert.equal((await other.readSave(save.id)).events.length,2001);
+report.graphNodes=graph.nodes.size;report.canonicalTurns=2001;report.archiveBytes=Buffer.byteLength(JSON.stringify(archive));report.memory=process.memoryUsage();report.passed=true;report.limitations='Not proof of real legacy story gameplay, browser heap use, phone performance, or live provider throughput.';
+await mkdir('evidence',{recursive:true});await writeFile('evidence/performance.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));
