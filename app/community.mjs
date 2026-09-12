@@ -4,7 +4,7 @@ import {metadata} from './storage/base.mjs';
 
 /** A same-origin client. Credentials never enter portable content or archives. */
 export class CommunityClient {
-  constructor({transport=globalThis.fetch,instance=globalThis.location?.origin || 'local'}={}){this.transport=transport;this.instance=instance;this.user=null;}
+  constructor({transport=(...args)=>globalThis.fetch(...args),instance=globalThis.location?.origin || 'local'}={}){this.transport=transport;this.instance=instance;this.user=null;}
   async request(path,{method='GET',body,signal}={}){
     requireThat(path.startsWith('/api/'),'Community requests must use this instance.');
     const response=await this.transport(path,{method,credentials:'same-origin',headers:body===undefined?{}:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal});

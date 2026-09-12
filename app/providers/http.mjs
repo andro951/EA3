@@ -1,7 +1,7 @@
 import {id,requireThat} from '../core/util.mjs';
 import {normalizedResponse} from './stream.mjs';
 export class HttpProvider {
-  constructor(kind='text',{fetcher=globalThis.fetch,base='/api/generate'}={}){this.id='http';this.kind=kind;this.fetcher=fetcher;this.base=base;}
+  constructor(kind='text',{fetcher=(...args)=>globalThis.fetch(...args),base='/api/generate'}={}){this.id='http';this.kind=kind;this.fetcher=fetcher;this.base=base;}
   async generate(request,{signal,onChunk=()=>{}}={}) {
     const requestId=request.action?.id || request.requestId || id('request');
     const response=await this.fetcher(`${this.base}/${this.kind}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId,request}),signal});
