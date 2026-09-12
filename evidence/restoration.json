@@ -1,0 +1,9 @@
+{
+  "source_commit": "d7e4d4af65f074a1777316bd2d9fd453907a1e5d",
+  "restored_tree": "84f446653af78e0ffc6d6346b0c98a722b5c2dbe",
+  "artifact_id": 10293655351,
+  "artifact_sha256": "8a89c711a98fca7fad727acfa1f40aae2373f7ba1da5e00c07ae582c735841d7",
+  "local_tests": {"pass": 37, "fail": 0},
+  "native_browser": "CI run 34678424304 passed. Source archive and native persistence/download/import report were retrieved and verified.",
+  "recovery": "Restored exact source and executable modes after local workspace reset; git write-tree matches the remote commit tree. No fresh scaffold."
+}

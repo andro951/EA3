@@ -1,0 +1,23 @@
+{
+  "mode": "native",
+  "nativeIndexedDB": true,
+  "liveAI": false,
+  "assertions": [
+    "Boot reaches familiar main menu",
+    "Main menu opens story library",
+    "Story setup creates playable adventure with chosen identity",
+    "Authored choice commits a second turn",
+    "UI purchase deducts exact cost",
+    "Phone game has no horizontal document overflow",
+    "Native IndexedDB stores exact UI events and world state",
+    "Native page reload restores complete adventure",
+    "Native browser downloads a complete adventure archive",
+    "Independent native browser context imports and resumes exact state"
+  ],
+  "errors": [],
+  "passed": true,
+  "recorded_at_utc": "2026-09-12T06:34:04Z",
+  "source_run": 34678424304,
+  "artifact_id": 10293655351,
+  "screenshots": "Thirteen native screenshots are retained in the workflow artifact, alongside the exact source-checkpoint.zip."
+}
