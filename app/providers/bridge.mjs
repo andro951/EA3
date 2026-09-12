@@ -33,7 +33,7 @@ export class HostBridge {
 export class PerchanceProvider {
   constructor(kind,bridge){this.id='perchance';this.kind=kind;this.bridge=bridge;}
   async generate(request,options={}){
-    const p=this.kind==='image'?imagePrompt(request):request.schema==='ea3/authoring/1'?authoringPrompt(request):narrativePrompt(request);
+    const p=this.kind==='image'?imagePrompt(request):this.kind==='author'||request.schema==='ea3/authoring/1'?authoringPrompt(request):narrativePrompt(request);
     const payload=this.kind==='image'?p:{instruction:p.system+'\n\n'+p.user};
     const result=await this.bridge.request(this.kind==='author'?'text':this.kind,payload,{...options,requestId:request.action?.id || request.requestId || id('request')});
     return {...result,promptVersion:p.version,context:p.context,provider:'perchance',simulated:false};

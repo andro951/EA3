@@ -11,7 +11,7 @@ export class Session {
     requireThat(!this.pending,'A response is already in progress. Stop it before making another change.','BUSY');
     const original=this.save,base=replaceFrom===null?original:rewriteBase(original,replaceFrom);
     const plan=planAction(this.compiled,base,{...action,id:id('turn')});
-    const epoch=++this.epoch,controller=new AbortController();this.pending={id:plan.id,epoch,controller};
+    const epoch=++this.epoch,controller=new AbortController();this.pending={id:plan.id,epoch,controller,phase:'generating'};
     const valid=()=>this.epoch===epoch && !controller.signal.aborted;
     let failure=null;
     this.onStatus({phase:plan.narrative?'generating':'saving',label:plan.narrative?'The story is unfolding…':'Saving changes…'});
@@ -21,6 +21,7 @@ export class Session {
       const result=resultOverride || (plan.narrative?await this.provider.generate(plan.semantic,{signal:controller.signal,onChunk:chunk=>{if(valid())this.onChunk(chunk);}}):{});
       if(!valid())throw new DOMException('Stopped','AbortError');
       const next=commitAction(base,plan,result);
+      this.pending.phase='saving';
       this.onStatus({phase:'saving',label:'Saving adventure…'});
       await this.repository.commitSave(next,original.revision,{from:replaceFrom===null?original.events.length:replaceFrom,guard:valid,jobId:plan.id});
       this.save=next;this.onChange(next);
@@ -31,16 +32,23 @@ export class Session {
       if(error.name!=='AbortError')this.onStatus({phase:'error',label:error.message,code:error.code});
       throw error;
     } finally {
-      if(this.pending?.id===plan.id){this.pending=null;if(!failure)this.onStatus({phase:'ready',label:'Saved locally'});}
+      if(this.pending?.id===plan.id){
+        this.pending=null;
+        this.onStatus(failure&&failure.name!=='AbortError'?{phase:'error',label:failure.message,code:failure.code}:{phase:'ready',label:failure?'Stopped before saving · previous story retained':'Saved locally'});
+      }
     }
   }
   stop() {
     this.auto=false;this.autoToken++;this.epoch++;
-    const pending=this.pending;this.pending=null;pending?.controller.abort();
+    const pending=this.pending;pending?.controller.abort();
+    // Once storage has accepted its transaction, wait for its actual outcome.
+    // Never start a new action against an in-memory revision that is still committing.
+    if(pending?.phase==='saving'){this.onStatus({phase:'saving',label:'Stopping · waiting for the current save transaction'});return;}
+    this.pending=null;
     this.onStatus({phase:'ready',label:pending?'Generation stopped · nothing committed':'Auto stopped'});
   }
   async rewind(eventCount) {
-    this.stop();const old=this.save,next=rewind(old,eventCount),epoch=this.epoch;
+    this.stop();requireThat(!this.pending,'A save transaction is finishing. Try rewind once it completes.','BUSY');const old=this.save,next=rewind(old,eventCount),epoch=this.epoch;
     await this.repository.commitSave(next,old.revision,{from:eventCount,guard:()=>epoch===this.epoch});
     this.save=next;this.onChange(next);return next;
   }
@@ -60,7 +68,7 @@ export class Session {
   }
   async updateMetadata(change) {
     requireThat(!this.pending,'Finish or stop generation first.');
-    const allowed=Object.fromEntries(Object.entries(change).filter(([k])=>['title','bookmarks','characters','profile','assets','memoryCandidates'].includes(k)));
+    const allowed=Object.fromEntries(Object.entries(change).filter(([k])=>['title','bookmarks','profile','assets','memoryCandidates'].includes(k)));
     const old=this.save,next={...old,...clone(allowed),id:old.id,state:old.state,initial:old.initial,events:old.events,revision:old.revision+1,updatedAt:now()};
     await this.repository.commitSave(next,old.revision,{from:old.events.length});this.save=next;this.onChange(next);return next;
   }

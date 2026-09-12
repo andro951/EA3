@@ -8,8 +8,8 @@ export class GraphView {
     this.canvas=$('canvas',host);this.layer=$('.graph-nodes',host);this.drag=null;
     this.events=new AbortController();const signal=this.events.signal;
     host.addEventListener('pointerdown',e=>this.down(e),{signal});host.addEventListener('pointermove',e=>this.motion(e),{signal});host.addEventListener('pointerup',e=>this.up(e),{signal});host.addEventListener('pointercancel',()=>{this.drag=null;this.draw();},{signal});
-    host.addEventListener('wheel',e=>{e.preventDefault();this.zoom(e.deltaY<0?1.12:1/1.12,e.offsetX,e.offsetY);},{passive:false,signal});
-    host.addEventListener('click',e=>{const b=e.target.closest('[data-node-id]');if(b && !this.moved){this.selected=b.dataset.nodeId;this.callbacks.select(this.selected);this.draw();}},{signal});
+    host.addEventListener('wheel',e=>{e.preventDefault();const r=host.getBoundingClientRect();this.zoom(e.deltaY<0?1.12:1/1.12,e.clientX-r.left,e.clientY-r.top);},{passive:false,signal});
+    host.addEventListener('click',e=>{const b=e.target.closest('[data-node-id]');if(b && e.detail===0){this.selected=b.dataset.nodeId;this.callbacks.select(this.selected);this.draw();}},{signal});
     this.observer=new ResizeObserver(()=>{const box=host.getBoundingClientRect();this.view.width=box.width;this.view.height=box.height;this.draw();});this.observer.observe(host);this.update(story);
   }
   update(story){this.index=new GraphIndex(story);this.draw();}
@@ -20,6 +20,7 @@ export class GraphView {
     d.lastX=e.clientX;d.lastY=e.clientY;this.draw();
   }
   up(e){const d=this.drag;if(!d)return;this.drag=null;this.host.releasePointerCapture(e.pointerId);
+    if(d.type==='node'&&!this.moved){this.selected=d.id;this.callbacks.select(d.id);}
     if(d.type==='node'&&this.moved){const p=this.index.positions[d.id];this.callbacks.move(d.id,p);}
     if(d.type==='connect'){const r=this.host.getBoundingClientRect(),p={x:(e.clientX-r.left-this.view.x)/this.view.zoom,y:(e.clientY-r.top-this.view.y)/this.view.zoom};const to=this.index.visible(this.view).nodes.find(n=>{const a=this.index.positions[n.id];return p.x>=a.x && p.x<=a.x+NODE_WIDTH && p.y>=a.y && p.y<=a.y+NODE_HEIGHT;});if(to)this.callbacks.connect(d.id,to.id);}
     this.draw();

@@ -9,6 +9,8 @@ export function projectCharacters(save){
 }
 export function createAdventure(...args){return projectCharacters(createBase(...args));}
 export function planAction(compiled,save,action){
+  requireThat(action&&typeof action.kind==='string','Choose a valid action.');
+  if(save.state.ending&&compiled.story.afterEnding==='stop'&&['say','continue','auto','choice','travel','offer','recruit'].includes(action.kind))throw new Error('This story has ended. Rewind or begin another adventure to continue playing.');
   if(!['add-character','presentation','reset-presentation'].includes(action.kind))return planBase(compiled,save,action);
   requireThat(!save.events.some(e=>e.id===action.id),'This action was already committed.','DUPLICATE');
   const state=clone(save.state);let summary;
