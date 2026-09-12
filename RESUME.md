@@ -1,16 +1,14 @@
 # EA3 resume
 
-Phase: playable interface foundation; expansion is in progress.
+Phase: playable foundation restored; capability expansion underway.
 
-Verified 2026-09-12 06:30 UTC:
-- 37 core/session/storage unit tests pass.
-- Actual offline Chromium UI actions pass: original illustrated menu, library, story details/setup, three-column game, authored choices, paid shop transaction, inventory, character inspection, map, settings, phone layout and drawers.
-- Twelve screenshots captured locally. Desktop menu, desktop game, and phone menu were visually inspected; the original EA1 illustrated menu and familiar three-column hierarchy are retained with ember-and-black polish.
-- All source for this playable foundation is saved in this checkpoint. Native browser navigation remains blocked locally; offline UI uses explicit storage/network doubles. Do not claim native IndexedDB acceptance from it.
-- Original EA1 menu PNGs were retrieved by the repository's checksum-verifying workflow and committed at eb948aa06ed613f7c99c71716b9feec55ec0d69f.
+Verified 2026-09-12:
+- Restored exact source from GitHub Actions artifact 10293655351 after local workspace reset. Its SHA-256 matched, and git write-tree matches the remote tree 84f446653af78e0ffc6d6346b0c98a722b5c2dbe.
+- Re-ran 37 unit tests: all pass.
+- Native CI run 34678424304 passed actual IndexedDB, reload, complete-archive download, and import through an independent browser context. Source and screenshots survive in that artifact. Live AI/hardware are not covered.
 
-Current launch content: The Ember Road (11 story nodes, 4 endings), Rhea, Calder and Fen. Portraits are EA2 vector studies, not live generated images. Default narrator is explicitly labeled a local authored/scripted demo, not an LLM.
+Next: provider registry, visual story/character editors, owned images and presentation previews, voice, backups/transfer/recovery, legacy import review, community and protected tools. These modules are not yet claimed implemented.
 
-Next: commit test tooling and independent native CI; complete provider registry, story/character graph editor, images/staged appearance, folder backups, transfer, voice, canonical character additions, legacy import review, community/workbench/operator/recovery interfaces. These optional UI destinations are NOT finished in this checkpoint. No full EA3 release is claimed.
+EA1 defines feel and authoring references; EA2 donates engineering ideas. One canonical timeline. Keep reviewing actual desktop/mobile screenshots. Default narrator remains a labeled local scripted demo.
 
-Remote GitHub connector works; CLI Git DNS does not. Use non-force main updates, preserve collaborator commits, and verify remote blob hashes. If local work disappears, recover this repository rather than making another empty scaffold.
+GitHub connector is the remote transport because CLI Git DNS is unavailable. Verify remote writes and never force main. Recover from remote source artifacts/trees if local files disappear. A local commit alone is not a remote backup.
