@@ -13,6 +13,9 @@ jobs:
   native-browser:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      EA3_TEST_INSTANCE: "1"
+      EA3_DATA_DIR: ${{ runner.temp }}/ea3-community-ui
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -46,6 +49,8 @@ jobs:
           python tools/media_ui_test.py --native
           python tools/utility_ui_test.py --native
           python tools/transfer_ui_test.py
+      - name: Community and protected operator workflows
+        run: python tools/community_ui_test.py --native
       - name: Preserve exact source and reports
         if: always()
         run: |
