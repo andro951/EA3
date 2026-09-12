@@ -1,15 +1,7 @@
 # EA3 resume
 
-Phase: playable foundation restored; capability expansion underway.
+2026-09-12 continuation. Restored f8d8ba394ec2500c3c856c01fc72fbeec28e77f4 from GitHub Actions artifact 10293132979. Archive SHA-256 verified; after restoring executable permission on START-MAC-LINUX.sh, local Git tree exactly matches 2849fce3312cac1577beb0d3ed843a6e1a61d155. All 66 current unit tests pass locally.
 
-Verified 2026-09-12:
-- Recovered the exact latest source from authorized GitHub Actions artifact 10293655351 after the temporary workspace reset. Its archive SHA-256 matched, and the reconstructed Git tree exactly matches 84f446653af78e0ffc6d6346b0c98a722b5c2dbe at commit d7e4d4af65f074a1777316bd2d9fd453907a1e5d.
-- Re-ran all 37 unit tests locally: pass.
-- Native CI run 34678424304 succeeded. The retrieved report confirms actual IndexedDB, reload, complete-archive download, and independent-context import through the UI. This supersedes the previous unverified native-foundation gate, not the live-AI/hardware gates.
-- Original illustrated menu, story library/setup, three-column game, authored choices, economy, inspection, map, settings and mobile drawers are implemented.
+New checkpoint: graph-view.mjs and editor.css implement the viewport-bounded graph canvas and ember-black editor layout. The editor controller/forms are the next slice; do not call this a complete editor yet. Preserved EA1 graph-first workflow after reviewing its visual-story-tree creator design. Local native navigation is blocked by ERR_BLOCKED_BY_ADMINISTRATOR; use the existing explicitly labeled offline DOM harness locally and normal native GitHub CI. Do not change browser policy.
 
-Next: provider registry and reliable transport, full visual story/character editors, image ownership and matching presentation previews, voice, backups/transfer/recovery, legacy import review, community and protected tools. These remaining modules are not claimed implemented by this checkpoint.
-
-Use EA1 for feel and visual/authoring references throughout; EA2 is an engineering donor. One canonical timeline only. Keep reviewing desktop/mobile screenshots. Default narrator is a labeled scripted demo, not an LLM.
-
-Remote writes use the GitHub connector because local Git DNS cannot resolve github.com. Push coherent source/test milestones, verify the ref and tree, never force main, and recover from the latest remote source artifact/tree if local files disappear. Never call a local-only commit a remote backup.
+Next: connect recoverable draft model to complete story/character editing, typed conditions/effects and graph inspector; UI-test and screenshot-review. Then images/presentation, voice, backups/transfer/recovery, migration and public/tools. Keep one canonical player timeline and EA1 feel. Push coherent source at regular checkpoints through the authorized GitHub connector, never force main. No full release is claimed.
