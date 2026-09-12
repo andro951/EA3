@@ -1,0 +1,1 @@
+{"phase":"authoring-core","command":"npm test","passed":66,"failed":0,"largeGraphNodes":20000,"scope":"Authoring model, graph indexing, and existing runtime/provider tests. Visual editor UI integration is next; not yet claimed accepted."}
