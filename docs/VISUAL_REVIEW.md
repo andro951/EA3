@@ -22,3 +22,12 @@ Visually opened and reviewed: launch library at 1920 and 320 pixels; the four-ch
 The twenty-ending browser playthrough caught a stale “Auto stopped” status inherited when another adventure was opened. Attach now resets the visible status and streaming text to the newly loaded, committed adventure. The complete rerun passed with no page errors and nineteen screenshots. Its native counterpart is added to CI separately.
 
 One remaining polish issue found in the offers screenshot: paid work displayed only its zero upfront cost, obscuring pay and duration. That is recorded for the next UI pass rather than called finished here.
+
+
+## Offer clarity pass — 2026-09-12
+
+The paid-work review issue is now fixed. Offer summaries preview the same validated transaction as acceptance, without persisting or mutating it. They disclose upfront cost, gross payment, items received/used, story-time duration and remaining stock. Unavailable entries explain missing resources, requirements or sold-out status.
+
+Re-ran all twenty authored routes through the UI after wiring the new offer view. Opened both desktop and 390-pixel phone screenshots. The potting shift now visibly says “Pays 8 coins” and “2 story-time units”; the sale identifies its consumed seedling. On phones the accept buttons move below the outcome text rather than squeezing the title into a thin column. The interface keeps the existing dark surfaces, ember accents and modal behavior. No page errors or horizontal overflow were recorded.
+
+Native CI run 34719237333 passed at source 5266b74a0a06e85ed5f3bb543209bba16942fb60, including the new twenty-ending UI route suite. The subsequent offer polish must be verified at its own commit, not inferred from that earlier green run.

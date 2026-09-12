@@ -18,6 +18,8 @@ jobs:
       EA3_DATA_DIR: .runtime/ci-community
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22.16.0'
@@ -65,6 +67,8 @@ jobs:
         run: |
           git rev-parse HEAD > evidence/ci-commit.txt
           git archive --format=zip HEAD > evidence/source-checkpoint.zip
+          git bundle create evidence/EA3-history.bundle --all
+          git bundle verify evidence/EA3-history.bundle
           if [ -f /tmp/ea3-test-server.pid ]; then kill "$(cat /tmp/ea3-test-server.pid)" || true; fi
       - uses: actions/upload-artifact@v4
         if: always()

@@ -64,7 +64,13 @@ try:
                 page.locator('[data-action="travel-location"][data-id="'+action['location']+'"]').click()
             elif action['kind']=='offer':
                 page.locator('[data-action="offers"]').first.click()
-                if action['offerId']=='potting':shot(page,'ea3-copper-work-offers-desktop')
+                if action['offerId']=='potting':
+                    job=page.locator('[data-offer-id="potting"]')
+                    expect(job).to_contain_text('Pays 8 coins');expect(job).to_contain_text('2 story-time units')
+                    shot(page,'ea3-copper-work-offers-desktop')
+                    page.set_viewport_size({'width':390,'height':844});shot(page,'ea3-copper-work-offers-mobile')
+                    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
+                    page.set_viewport_size({'width':1440,'height':1000})
                 page.locator('[data-action="take-offer"][data-id="'+action['offerId']+'"]').click()
             else:raise AssertionError('Unknown acceptance action')
             turns+=1;expect(page.locator('.turn')).to_have_count(turns,timeout=15000);ready(page)
