@@ -38,3 +38,12 @@ test('invalid or duplicated definitions are rejected before any write',async()=>
  await assert.rejects(installBuiltins(repo,{...pack,items:[{...starterStory,start:'missing'}]}),/opening/);
  assert.deepEqual(await repo.snapshot(),before);
 });
+
+test('launch installer adds seven stories and sixteen characters on a new installation',async()=>{
+ const {installLaunchContent}=await import('../app/storage/launch.mjs');const repo=new MemoryRepository();
+ await installLaunchContent(repo);assert.equal((await repo.listContent('story')).length,7);assert.equal((await repo.listContent('character')).length,16);
+});
+test('launch upgrade respects the original seed marker when earlier examples were deleted',async()=>{
+ const {installLaunchContent}=await import('../app/storage/launch.mjs');const repo=new MemoryRepository();await repo.put('meta','seedVersion',1);
+ await installLaunchContent(repo);assert.equal(await repo.getContent('character','rhea'),undefined);assert.equal((await repo.listContent('story')).length,6);
+});

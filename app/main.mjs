@@ -5,7 +5,7 @@ import {Session} from './core/session.mjs';
 import {voice} from './voice.mjs';
 import {clone,id,now,requireThat,safeJSON,download} from './core/util.mjs';
 import {DemoNarrator} from './providers/demo.mjs';
-import {starterCharacters,starterStory} from '../content/seed.mjs';
+import {installLaunchContent} from './storage/launch.mjs';
 import {home,header,library,libraryCards,game} from './ui/screens.mjs';
 import {$,$$,esc,button,badge,image,field,modal,confirmDialog,toast,onError,closeDialogs,readForm,empty} from './ui/dom.mjs';
 import {contentDetail,storySetup,profiles,settings,autoSettings,cast,inspectCharacter,worldMap,inventory,offers,memory,saves,bookmarks,editTurn,guidance,dataTools,about} from './ui/dialogs.mjs';
@@ -75,7 +75,7 @@ async function boot(){
   await app.repo.open();app.repo.onWarning=message=>toast(message,true);
   const existing=await app.repo.get('meta','settings');app.settings={...defaults,...existing};app.applySettings();
   const profiles=await app.repo.get('meta','profiles'),active=await app.repo.get('meta','activeProfile');if(profiles?.length)app.profile=profiles.find(p=>p.id===active)||profiles[0];else await app.persistProfile();
-  if(!await app.repo.get('meta','seedVersion')){for(const c of starterCharacters)if(!await app.repo.getContent('character',c.id))await app.repo.putContent(c);if(!await app.repo.getContent('story',starterStory.id))await app.repo.putContent(starterStory);await app.repo.put('meta','seedVersion',1);}
+  await installLaunchContent(app.repo);
   await app.refreshAssets();await app.refreshSaves();app.render();const {installBackups}=await import('./ui/backups.mjs');await installBackups(app).catch(error=>toast('Folder backup could not initialize: '+error.message,true));
   const jobs=await app.repo.all('jobs');if(jobs.some(j=>j.state==='submitted'||j.state==='failed-or-unknown'))toast('A previous generation was interrupted. Your last committed story is intact. Review pending jobs in Workbench; no request was silently resubmitted.',true);
 }
