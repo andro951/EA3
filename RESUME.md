@@ -1,9 +1,11 @@
 # EA3 resume
 
-Phase: canonical runtime implemented; persistence and UI next.
+Phase: runtime, session, and storage implemented; first player interface next.
 
-Verified locally on 2026-09-12: Node 22.16.0; native Chromium launches; 21 runtime tests pass. The new source is in app/core/{util,schema,history,runtime}.mjs. It implements validated story graphs, reversible state deltas, canonical replacement/rewind, atomic economy, equipment/outfits, typed conditions/effects, timed developments, and reviewable memory candidates. No UI is claimed finished yet.
+Verified locally on 2026-09-12: Node 22.16.0; 37 tests pass. Core implements canonical replacement/rewind, reversible state deltas, validated graph actions, atomic economy, equipment/outfits, timed developments, and reviewable memory candidates. Session persists jobs before dispatch, rejects stale output, supports manual narration replacement, Observe/Delegate Auto, and optimistic multi-tab writes. Persistence implements normalized IndexedDB records, complete hashed archives, conflict-safe imports, frozen definitions, and owned image assets.
 
-Recovery: prior EA3 archive had no source. EA1 and EA2 reference packages survived. See docs/RECOVERY.md. GitHub connector is the active remote transport because command-line DNS is unavailable. Main is updated without force at checkpoints. Source has been read back/checked against remote trees at release gates, not assumed saved because a local commit exists.
+Important qualification: storage tests use an explicit MemoryRepository. Native Chromium navigation to localhost returns ERR_BLOCKED_BY_ADMINISTRATOR. Offline DOM rendering works; use it for real interface interaction and screenshot review with clearly labeled storage/network doubles. Do not change managed policies. Keep a separate native acceptance runner.
 
-Next: normalize IndexedDB persistence, implement the session cancellation/Auto controller, and recreate EA1 main menu plus its three-column adventure screen. Reference EA1 shell/page.html, styles/app.css, and 05-menus-profiles.js throughout. Capture screenshots with real local Chromium and isolated data.
+Recovery: prior EA3 archive had no source. EA1/EA2 reference packages survived outside this repository. See docs/RECOVERY.md. GitHub connector is the active remote transport because command-line DNS is unavailable. Core local file hashes have been compared successfully against remote Git blobs.
+
+Next: implement content, provider simulators, static service, and the EA1-style main menu / three-column adventure UI; screenshot and compare before broad expansion. No player UI is claimed finished in this checkpoint.

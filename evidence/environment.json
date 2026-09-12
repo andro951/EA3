@@ -1,0 +1,10 @@
+{
+  "recorded_at_utc": "2026-09-12T05:53:00Z",
+  "filesystem": "Working: source files written and read; Git blob hashes match five remotely stored source/test files.",
+  "node": "22.16.0",
+  "chromium": "Installed and able to render offline DOM",
+  "native_navigation": "Blocked: net::ERR_BLOCKED_BY_ADMINISTRATOR for http://127.0.0.1:4311/",
+  "response_to_policy": "No policy changes or bypasses. Use explicitly labeled offline DOM tests and separate native acceptance runner.",
+  "git_cli_network": "Could not resolve host github.com",
+  "github_connector": "Working. Canonical runtime and tests saved at 6c91476b7a25033d0e47ffe2daebaff5bbabe167."
+}

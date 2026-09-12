@@ -1,0 +1,1 @@
+{"command":"npm test","recorded_at_utc":"2026-09-12T05:53:15Z","tests":37,"passed":37,"failed":0,"scope":"Core and session/storage tests with explicit MemoryRepository. Native IndexedDB and live providers are not qualified by this run."}
