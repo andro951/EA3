@@ -1,0 +1,10 @@
+{
+  "phase": "canonical-runtime",
+  "recorded_at_utc": "2026-09-12T05:43:42Z",
+  "command": "npm test",
+  "node": "22.16.0",
+  "tests": 21,
+  "passed": 21,
+  "failed": 0,
+  "scope": "Unit tests only. No UI or live-provider qualification claimed."
+}

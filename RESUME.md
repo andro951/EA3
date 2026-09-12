@@ -1,12 +1,9 @@
 # EA3 resume
 
-Phase: recovery and first implementation.
+Phase: canonical runtime implemented; persistence and UI next.
 
-Verified on 2026-09-12:
-- Prior EA3 recovery archive contains zero project directories and zero source files.
-- EA1 reference ZIP and EA2 0.9.0 source are available and extracted read-only as references outside this repository.
-- Node 22.16.0, Chromium, Python Playwright, and local filesystem work.
-- Git command-line network cannot resolve github.com. Use authorized GitHub connector read/write operations for checkpoints; do not assume a git push succeeded.
-- GitHub main initially points to 944267fc88079a231c4a1f84061db982d384c793, the earlier temporary-file removal commit.
+Verified locally on 2026-09-12: Node 22.16.0; native Chromium launches; 21 runtime tests pass. The new source is in app/core/{util,schema,history,runtime}.mjs. It implements validated story graphs, reversible state deltas, canonical replacement/rewind, atomic economy, equipment/outfits, typed conditions/effects, timed developments, and reviewable memory candidates. No UI is claimed finished yet.
 
-Next: implement and test the canonical runtime, render EA1 in a network-isolated reference browser, then implement the familiar main menu and adventure screen. Keep reviewing EA1 throughout. No prior implementation is claimed recovered.
+Recovery: prior EA3 archive had no source. EA1 and EA2 reference packages survived. See docs/RECOVERY.md. GitHub connector is the active remote transport because command-line DNS is unavailable. Main is updated without force at checkpoints. Source has been read back/checked against remote trees at release gates, not assumed saved because a local commit exists.
+
+Next: normalize IndexedDB persistence, implement the session cancellation/Auto controller, and recreate EA1 main menu plus its three-column adventure screen. Reference EA1 shell/page.html, styles/app.css, and 05-menus-profiles.js throughout. Capture screenshots with real local Chromium and isolated data.
