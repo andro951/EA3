@@ -39,10 +39,13 @@ jobs:
             sleep 1
           done
           exit 1
-      - name: Native browser persistence, download, import, and UI
+      - name: Native browser persistence, authoring, media, recovery and RTC handoff
         run: |
           python tools/ui_test.py --native --phase foundation
           python tools/authoring_ui_test.py --native
+          python tools/media_ui_test.py --native
+          python tools/utility_ui_test.py --native
+          python tools/transfer_ui_test.py
       - name: Preserve exact source and reports
         if: always()
         run: |

@@ -3,8 +3,8 @@ import {planAction,commitAction,rewind,rewriteBase,choices} from './engine.mjs';
 
 /** The only coordinator allowed to commit generated narrative to an adventure. */
 export class Session {
-  constructor({save,compiled,repository,provider,onChange=()=>{},onStatus=()=>{},onChunk=()=>{}}) {
-    Object.assign(this,{save,compiled,repository,provider,onChange,onStatus,onChunk});
+  constructor({save,compiled,repository,provider,onChange=()=>{},onStatus=()=>{},onChunk=()=>{},onAutoWait=async()=>{}}) {
+    Object.assign(this,{save,compiled,repository,provider,onChange,onStatus,onChunk,onAutoWait});
     this.pending=null;this.epoch=0;this.autoToken=0;this.auto=false;
   }
   async turn(action,{replaceFrom=null,resultOverride=null}={}) {
@@ -75,6 +75,7 @@ export class Session {
         const safe=available.find(c=>c.autoSafe===true);
         const action=mode==='delegate' && safe?{kind:'choice',choiceId:safe.id}:{kind:'auto'};
         await this.turn(action);
+        if(this.auto&&token===this.autoToken)await this.onAutoWait();
         if(!this.auto || token!==this.autoToken || this.save.state.ending)break;
         if(available.length && !this.compiled.nodes.get(this.save.state.node)?.next && (mode==='observe' || !safe)) {
           this.onStatus({phase:'ready',label:'Auto paused for your decision'});break;

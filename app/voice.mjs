@@ -21,6 +21,7 @@ export class NarrationVoice {
   pause(){if(this.state==='speaking'){this.synthesis.pause();this.emit('paused');}}
   resume(){if(this.state==='paused'){this.synthesis.resume();this.emit('speaking');}}
   stop(){this.epoch++;this.synthesis?.cancel();this.emit('idle');}
+  finished(){if(['idle','error'].includes(this.state))return Promise.resolve();return new Promise(resolve=>{const stop=this.subscribe(state=>{if(['idle','error'].includes(state)){stop();resolve();}});});}
   replay(){requireThat(this.last,'Read a message first.');this.read(this.last.text,this.last.settings);}
 }
 export const voice=new NarrationVoice();
