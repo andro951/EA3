@@ -15,6 +15,7 @@ const remapAssets=(value,ownerMap)=>{
 };
 function remapCast(story,map) {
   for(const f of ['cast','backgroundCast'])if(story[f])story[f]=story[f].map(k=>map[k] || k);
+  if(story.initial?.relationships)story.initial.relationships=Object.fromEntries(Object.entries(story.initial.relationships).map(([k,v])=>[map[k] || k,v]));
   for(const row of [...(story.nodes || []),...(story.locations || [])])if(row.cast)row.cast=row.cast.map(k=>map[k] || k);
   const effects=rows=>{for(const e of rows || [])if(['relationship','memory','presence','recruit','outfit','unlockOutfit','equip'].includes(e.type))e.key=map[e.key] || e.key;};
   const conditions=rows=>{for(const c of rows || []){if(['relationship','member'].includes(c.type))c.key=map[c.key] || c.key;if(c.conditions)conditions(c.conditions);}};
@@ -43,8 +44,8 @@ export class RepositoryBase {
   async commitSave(save,expectedRevision=null,{from=0,guard=()=>true,jobId}={}) {
     const errors=validateSave(save);requireThat(!errors.length,errors.join('\n'));
     requireThat(Number.isInteger(from) && from>=0 && from<=save.events.length,'Invalid history write range.');
-    const {events,...head}=clone(save);head.eventCount=events.length;
-    const operations=[{store:'events',range:{lower:eventKey(save.id,from),upper:`${save.id}|\uffff`},delete:true},...events.slice(from).map((value,i)=>put('events',eventKey(save.id,from+i),value)),put('saves',save.id,head)];
+    const {events,...rest}=save,head=clone(rest);head.eventCount=events.length;
+    const operations=[{store:'events',range:{lower:eventKey(save.id,from),upper:`${save.id}|\uffff`},delete:true},...events.slice(from).map((value,i)=>put('events',eventKey(save.id,from+i),clone(value))),put('saves',save.id,head)];
     if(jobId)operations.push({store:'jobs',key:jobId,delete:true});
     await this.atomic(operations,{checks:[{store:'saves',key:save.id,field:'revision',expected:expectedRevision}],guard});
     return save;
@@ -57,6 +58,8 @@ export class RepositoryBase {
   }
   async copySave(save,title) {
     const copy={...clone(save),id:id('adventure'),title:title || `${save.title} · saved copy`,createdAt:now(),updatedAt:now(),revision:1};
+    const owned=(await this.all('assets')).filter(a=>a.links?.['save:'+save.id]).map(a=>a.id);
+    copy.assets=[...new Set([...(copy.assets || []),...owned])];
     await this.commitSave(copy,null);return copy;
   }
   async putAsset(asset) {
@@ -69,6 +72,8 @@ export class RepositoryBase {
   async exportArchive({saveId=null}={}) {
     const snapshot=await this.snapshot(PORTABLE),tables=snapshot.tables;
     tables.meta=(tables.meta || []).filter(r=>['settings','profiles','activeProfile'].includes(r.key));
+    // In-progress handoff chunks are local transport caches, not recursively portable user drafts.
+    tables.drafts=(tables.drafts || []).filter(r=>!r.key.startsWith('transfer:'));
     if(saveId) {
       const head=tables.saves.find(r=>r.key===saveId);requireThat(head,'Adventure not found.');
       tables.saves=[head];tables.events=tables.events.filter(r=>r.key.startsWith(saveId+'|'));
@@ -94,6 +99,9 @@ export class RepositoryBase {
     for(const row of tables.definitions || []){requireThat(!validateStory(row.value).length,'Invalid frozen story definition.');requireThat(await hash(canonical(row.value))===row.key,'Frozen story hash does not match.');}
     for(const row of tables.assets || []){requireThat(row.key===row.value.id && row.key===`image-${await hash(row.value.data)}` && row.value.hash===row.key.slice(6),'An image is corrupted.');requireThat(/^data:image\/(png|jpeg|webp);base64,/.test(row.value.data),'Unsupported image payload.');}
     const definitions=new Set((tables.definitions || []).map(r=>r.key)),assets=new Set((tables.assets || []).map(r=>r.key));
+    // Verify every owned reference, including portraits that are used only in earlier history.
+    const references=[...(tables.library || []),...(tables.definitions || []),...(tables.saves || []),...(tables.events || [])].map(r=>r.value);
+    while(references.length){const value=references.pop();if(typeof value==='string'){const key=value.replace(/^asset:/,'');if(/^image-[a-f0-9]{64}$/.test(key))requireThat(assets.has(key),`Missing referenced image ${key}.`);}else if(value&&typeof value==='object')for(const child of Object.values(value))references.push(child);}
     for(const head of tables.saves || []) {
       requireThat(head.key===head.value.id,'Adventure identity mismatch.');
       const rows=(tables.events || []).filter(r=>r.key.startsWith(head.key+'|')).sort((a,b)=>a.key.localeCompare(b.key));

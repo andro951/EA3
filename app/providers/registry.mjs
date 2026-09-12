@@ -4,10 +4,11 @@ import {HostBridge,PerchanceProvider} from './bridge.mjs';
 import {requireThat} from '../core/util.mjs';
 let bridge;
 function host(settings){return bridge ||= new HostBridge({origin:settings.hostOrigin || (typeof location!=='undefined'?new URLSearchParams(location.search).get('hostOrigin'):null) || 'https://perchance.org'});}
+function preferences(provider,settings){const generate=provider.generate.bind(provider);provider.generate=(request,options)=>generate({...request,guidance:String(settings.guidance || '')},options);return provider;}
 export function makeTextProvider(settings={}){
   if(!settings.textProvider||settings.textProvider==='demo')return new DemoNarrator();
-  if(settings.textProvider==='http')return new HttpProvider('text');
-  if(settings.textProvider==='perchance')return new PerchanceProvider('text',host(settings));
+  if(settings.textProvider==='http')return preferences(new HttpProvider('text'),settings);
+  if(settings.textProvider==='perchance')return preferences(new PerchanceProvider('text',host(settings)),settings);
   throw new Error('Unknown text provider. Your save was not changed.');
 }
 export function makeImageProvider(settings={}){
