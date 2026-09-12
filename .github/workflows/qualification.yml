@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 15
     env:
       EA3_TEST_INSTANCE: "1"
-      EA3_DATA_DIR: ${{ runner.temp }}/ea3-community-ui
+      EA3_DATA_DIR: .runtime/ci-community
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
