@@ -46,6 +46,7 @@ jobs:
         run: |
           python tools/ui_test.py --native --phase foundation
           python tools/authoring_ui_test.py --native
+          python tools/artwork_ui_test.py --native
           python tools/media_ui_test.py --native
           python tools/utility_ui_test.py --native
           python tools/transfer_ui_test.py
