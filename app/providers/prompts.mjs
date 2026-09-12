@@ -1,3 +1,4 @@
+import {memoryPrompt} from './memory-prompt.mjs';
 import {clone,requireThat,isRecord} from '../core/util.mjs';
 export const PROMPT_VERSION='ea3-prompts/1';
 /** Prompt syntax belongs here, not in the story runtime. Budgets never modify saved content. */
@@ -38,6 +39,7 @@ export function imagePrompt(request) {
   return {version:PROMPT_VERSION,prompt,negativePrompt:'text, watermark, duplicate limbs, disconnected anatomy, explicit nudity',seed:Number.isSafeInteger(request.seed)?request.seed:-1,resolution:request.kind==='portrait'?'512x768':'768x512'};
 }
 export function authoringPrompt(request) {
+  if(request.kind==='memory')return memoryPrompt(request.draft);
   requireThat(['story','character'].includes(request.kind) && isRecord(request.draft),'An authoring draft is required.');
   const user=JSON.stringify({kind:request.kind,instruction:request.instruction,draft:request.draft});
   requireThat(user.length<=100000,'This draft is too large for a single authoring request. Edit a smaller section.');

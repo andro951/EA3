@@ -53,6 +53,7 @@ jobs:
           python tools/authoring_ui_test.py --native
           python tools/artwork_ui_test.py --native
           python tools/media_ui_test.py --native
+          python tools/memory_ui_test.py --native
           python tools/utility_ui_test.py --native
           python tools/transfer_ui_test.py
       - name: Community and protected operator workflows
