@@ -1,0 +1,55 @@
+name: EA3 qualification
+on:
+  push:
+    branches: [main]
+    paths: ['app/**', 'server/**', 'content/**', 'public/**', 'tools/**', 'tests/**', '*.html', 'package*.json', '.github/workflows/qualification.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ea3-qualification-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit and integration tests
+        run: |
+          mkdir -p evidence
+          set -o pipefail
+          npm test 2>&1 | tee evidence/ci-unit-tests.log
+      - name: Install native browser test dependencies
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium
+      - name: Start isolated local application
+        run: |
+          node server/main.mjs > evidence/ci-server.log 2>&1 &
+          echo $! > /tmp/ea3-test-server.pid
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/api/health; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Native browser persistence, download, import, and UI
+        run: python tools/ui_test.py --native --phase foundation
+      - name: Preserve exact source and reports
+        if: always()
+        run: |
+          git rev-parse HEAD > evidence/ci-commit.txt
+          git archive --format=zip HEAD > evidence/source-checkpoint.zip
+          if [ -f /tmp/ea3-test-server.pid ]; then kill "$(cat /tmp/ea3-test-server.pid)" || true; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ea3-native-qualification-${{ github.sha }}
+          path: evidence/
+          retention-days: 30
