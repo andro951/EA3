@@ -56,6 +56,8 @@ jobs:
           python tools/memory_ui_test.py --native
           python tools/utility_ui_test.py --native
           python tools/transfer_ui_test.py
+      - name: All authored endings and responsive launch views
+        run: python tools/launch_ui_test.py --native
       - name: Community and protected operator workflows
         run: python tools/community_ui_test.py --native
       - name: Preserve exact source and reports

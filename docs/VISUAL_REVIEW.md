@@ -11,3 +11,14 @@ FIX: no player-facing timeline branches; independent scroll regions; old/failed 
 Captured 12 actual Chromium screenshots at 1440x1000 and 390x844, with realistic authored story state and a completed shop purchase. Visually opened desktop home, desktop game, and mobile home. The home retains the recognizable original artwork and hierarchy; game presents a clear center conversation with compact contextual panels. Re-ran interaction checks after CSS/module separation; no page errors or phone horizontal overflow.
 
 This is the early identity gate, not final visual qualification. More dense, long, empty, failed, editor and accessibility states must be reviewed during expansion. Local managed Chromium prohibits URL navigation; these captures use the real app in an offline DOM harness with explicitly substituted storage/transport. Native browser testing is a separate gate.
+
+
+## Expanded collection pass — 2026-09-12
+
+The seven-story library and two realistic opening scenes were captured at 1920x1080, 1366x768, 768x1024, 390x844 and 320x720. The local run uses explicitly labeled offline storage/network fixtures; it clicks the real application. No alternate layout or fake screenshots were substituted.
+
+Visually opened and reviewed: launch library at 1920 and 320 pixels; the four-character Table Seven opening at 1366x768; Low Tide at 390x844; Copper & Clover's paid-work offers. The library retains the ember-and-black cards, familiar navigation and useful information hierarchy. The laptop game retains separate character/world, conversation and image columns. On the phone the conversation remains readable and the composer stays accessible without horizontal overflow. The original EA2 vector studies remain visibly simpler than the original EA1 menu illustration; they are not represented as finished model-generated portraits.
+
+The twenty-ending browser playthrough caught a stale “Auto stopped” status inherited when another adventure was opened. Attach now resets the visible status and streaming text to the newly loaded, committed adventure. The complete rerun passed with no page errors and nineteen screenshots. Its native counterpart is added to CI separately.
+
+One remaining polish issue found in the offers screenshot: paid work displayed only its zero upfront cost, obscuring pay and duration. That is recorded for the next UI pass rather than called finished here.
