@@ -40,7 +40,9 @@ jobs:
           done
           exit 1
       - name: Native browser persistence, download, import, and UI
-        run: python tools/ui_test.py --native --phase foundation
+        run: |
+          python tools/ui_test.py --native --phase foundation
+          python tools/authoring_ui_test.py --native
       - name: Preserve exact source and reports
         if: always()
         run: |

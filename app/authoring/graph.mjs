@@ -1,5 +1,8 @@
 import {requireThat} from '../core/util.mjs';
-export const NODE_WIDTH=262,NODE_HEIGHT=136,COLUMN=340,ROW=185;
+export const NODE_WIDTH=262;
+export const NODE_HEIGHT=136;
+export const COLUMN=340;
+export const ROW=185;
 export function edgesOf(story){const edges=[];for(const n of story.nodes){if(n.next)edges.push({id:n.id+':next',from:n.id,to:n.next,label:'Continue',kind:'next'});for(const c of n.choices || [])if(c.to)edges.push({id:c.id,from:n.id,to:c.to,label:c.label,kind:'choice'});}return edges;}
 /** Iterative breadth-first layout: cyclic and disconnected graphs do not recurse forever. */
 export function autoLayout(story){const edges=edgesOf(story),outgoing=new Map(story.nodes.map(n=>[n.id,[]])),levels=new Map(),positions={};for(const e of edges)outgoing.get(e.from)?.push(e.to);let queue=[story.start],head=0;levels.set(story.start,0);while(head<queue.length){const from=queue[head++];for(const to of outgoing.get(from)||[])if(outgoing.has(to)&&!levels.has(to)){levels.set(to,levels.get(from)+1);queue.push(to);}}const depths=new Map(),last=Math.max(0,...levels.values());let disconnected=0;for(const n of story.nodes){const level=levels.has(n.id)?levels.get(n.id):last+2+Math.floor(disconnected++/12),row=depths.get(level)||0;depths.set(level,row+1);positions[n.id]={x:80+level*COLUMN,y:80+row*ROW};}return positions;}
