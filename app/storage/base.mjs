@@ -63,7 +63,7 @@ export class RepositoryBase {
     requireThat(typeof asset.data==='string' && /^data:image\/(png|jpeg|webp);base64,/.test(asset.data),'Use a PNG, JPEG, or WebP image.');
     const digest=await hash(asset.data),key=`image-${digest}`;
     const prior=await this.get('assets',key);
-    const value={...clone(asset),id:key,hash:digest,createdAt:prior?.createdAt || now(),links:{...prior?.links,...asset.links}};
+    const value={...clone(asset),...clone(prior || {}),id:key,hash:digest,createdAt:prior?.createdAt || now(),links:{...prior?.links,...asset.links}};
     await this.put('assets',key,value);return value;
   }
   async exportArchive({saveId=null}={}) {
@@ -73,11 +73,9 @@ export class RepositoryBase {
       const head=tables.saves.find(r=>r.key===saveId);requireThat(head,'Adventure not found.');
       tables.saves=[head];tables.events=tables.events.filter(r=>r.key.startsWith(saveId+'|'));
       tables.definitions=tables.definitions.filter(r=>r.key===head.value.definitionKey);
-      const wanted=new Set(head.value.assets || []);
-      for(const image of Object.values(head.value.state.images || {}))wanted.add(image);
-      for(const c of head.value.characters || [])if(c.image?.startsWith('asset:'))wanted.add(c.image.slice(6));
-      for(const row of tables.events)for(const ch of row.value.changes || [])if(ch.path?.[0]==='images'){if(ch.before)wanted.add(ch.before);if(ch.after)wanted.add(ch.after);}
-      tables.assets=tables.assets.filter(r=>wanted.has(r.key));tables.library=[];tables.drafts=[];tables.quarantine=[];tables.meta=[];
+      const wanted=new Set(head.value.assets || []),pending=[head.value,...tables.definitions.map(r=>r.value),...tables.events.map(r=>r.value)];
+      while(pending.length){const v=pending.pop();if(typeof v==='string'){if(v.startsWith('asset:image-'))wanted.add(v.slice(6));else if(/^image-[a-f0-9]{64}$/.test(v))wanted.add(v);}else if(v&&typeof v==='object')pending.push(...Object.values(v));}
+      tables.assets=tables.assets.filter(r=>wanted.has(r.key)||r.value.links?.['save:'+saveId]);tables.library=[];tables.drafts=[];tables.quarantine=[];tables.meta=[];
     }
     const payload={schema:'ea3/archive/1',id:id('archive'),createdAt:now(),tables};
     return {schema:'ea3/envelope/1',hash:await hash(canonical(payload)),payload};

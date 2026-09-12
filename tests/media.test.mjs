@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {cropRect,dataBlob,containsAsset,removeUnusedAsset} from '../app/media/raster.mjs';
+import {MemoryRepository} from './support/memory-repository.mjs';
+import {compile} from '../app/core/schema.mjs';
+import {createAdventure} from '../app/core/engine.mjs';
+import {starterStory,starterCharacters} from '../content/seed.mjs';
+test('crop rectangle stays inside source for all supported aspect/focal combinations',()=>{for(const ratio of [.2,.667,1,1.5,5])for(const zoom of [1,2,8])for(const x of [0,.5,1])for(const y of [0,.5,1]){const r=cropRect(1600,900,{ratio,zoom,x,y});assert.ok(r.x>=0&&r.y>=0&&r.x+r.width<=1600.0001&&r.y+r.height<=900.0001);assert.ok(Math.abs(r.width/r.height-ratio)<.0001);}});
+test('invalid crop requests and active image payloads are refused',()=>{assert.throws(()=>cropRect(5,5,{zoom:0}));assert.throws(()=>cropRect(5,5,{x:NaN}));assert.throws(()=>dataBlob('data:image/svg+xml,<svg/>'));assert.throws(()=>dataBlob('https://example.com/picture.png'));});
+test('image reference scan handles canonical history and prefixed library references',()=>{assert.ok(containsAsset({a:[{before:'image-test'}]},'image-test'));assert.ok(containsAsset({image:'asset:image-test'},'image-test'));assert.ok(!containsAsset({image:'different'},'image-test'));});
+test('deleting a used image cannot break history',async()=>{const repo=new MemoryRepository();await repo.put('assets','image-x',{data:'test'});await repo.put('events','event',{changes:[{before:'image-x'}]});await assert.rejects(removeUnusedAsset(repo,'image-x'),/history/);assert.ok(await repo.get('assets','image-x'));await repo.remove('events','event');await removeUnusedAsset(repo,'image-x');assert.equal(await repo.get('assets','image-x'),undefined);});
+test('single-adventure archive retains its unselected owned gallery images',async()=>{const repo=new MemoryRepository(),compiled=compile(starterStory),save=createAdventure(compiled,starterCharacters,{name:'Test',rating:'sfw'});save.definitionKey=await repo.freeze(starterStory);await repo.commitSave(save);const asset=await repo.putAsset({data:'data:image/png;base64,AA==',links:{['save:'+save.id]:true}});const archive=await repo.exportArchive({saveId:save.id});assert.ok(archive.payload.tables.assets.some(a=>a.key===asset.id));});

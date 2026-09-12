@@ -1,0 +1,1 @@
+{"recorded_at_utc":"2026-09-12T08:03:42Z","unit_tests":77,"unit_passed":77,"ui_assertions":8,"ui_passed":true,"ui_mode":"offline DOM with explicit storage/network doubles, real raster decoding","visually_reviewed":["ea3-gallery-desktop-pass1.png","ea3-appearance-desktop-pass1.png","ea3-appearance-mobile-pass1.png"],"live_generation_verified":false,"full_EA1_parity":false}

@@ -1,5 +1,5 @@
 import {id, now, requireThat, sleep, clone} from './util.mjs';
-import {planAction,commitAction,rewind,rewriteBase,choices} from './runtime.mjs';
+import {planAction,commitAction,rewind,rewriteBase,choices} from './engine.mjs';
 
 /** The only coordinator allowed to commit generated narrative to an adventure. */
 export class Session {
