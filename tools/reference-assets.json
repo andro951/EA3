@@ -1,0 +1,10 @@
+[
+  {"path":"public/art/landscape.png","url":"https://user.uploads.dev/file/32bbf452275230c5f6e10b3256c331e0.png","sha256":"6cce5f491dfa9621e1cea6a59588db6c7af49435dd6d28f99e5a350693d5920f","bytes":2484021,"source":"EA1 supplied menu_assets/BackgroundImage.png"},
+  {"path":"public/art/daylight.png","url":"https://user.uploads.dev/file/51f3d5362cf873d10449f80d2947b626.png","sha256":"6213df81498e9f3e6b449ed3adff430536d95d9d69e97a27a7eb184a176b47df","bytes":2993928,"source":"EA1 supplied menu_assets/BackgroundImage2.png"},
+  {"path":"public/art/logo.png","url":"https://user.uploads.dev/file/fc6f055b580f5f1a6c07e022a502e1a5.png","sha256":"11f9719d84873c147b685156e10f2ac04614013493b258b1881d1c304352bc77","bytes":788294,"source":"EA1 supplied menu_assets/EmberAdventuresLogo2.png"},
+  {"path":"public/art/menu-continue.png","url":"https://user.uploads.dev/file/48905d8400a02c6c1ea808ee7dd0440e.png","sha256":"52f0f0b0c83224de1755139ffe8054eceececaddf33c77445939d90ec59bf36c","bytes":217036,"source":"EA1 supplied menu_assets/CompassButton.png"},
+  {"path":"public/art/menu-new.png","url":"https://user.uploads.dev/file/c6fc58db157dd0e24c85126e961b474e.png","sha256":"09ac8ac81932ce9a11aed78e9eaeb30d2417267368969c974fb513c17ac5f23a","bytes":201748,"source":"EA1 supplied menu_assets/OpenGatesButton.png"},
+  {"path":"public/art/menu-saves.png","url":"https://user.uploads.dev/file/14022ab6b414fb0689bc95cec2a2daa5.png","sha256":"a941e6a4c526c460692b07b6d6b7531461cbc2dc458659ee2e2b9b3683cf65f0","bytes":192164,"source":"EA1 supplied menu_assets/JournalButton.png"},
+  {"path":"public/art/menu-stories.png","url":"https://user.uploads.dev/file/4ea0ff73d076d14bafca690c184b540f.png","sha256":"037b33dde441a79db1dfe627ce20ae92bfc38e5947f60c3df23384991472983e","bytes":198959,"source":"EA1 supplied menu_assets/OpenBookButton.png"},
+  {"path":"public/art/menu-characters.png","url":"https://user.uploads.dev/file/5770f60f24204530c1e5bc92401d627c.png","sha256":"bf2ad8502a84565dc609226e9f10064d9e504364717e37f4824769fe0fb5c70e","bytes":183677,"source":"EA1 supplied menu_assets/HoodedFigureButton.png"}
+]
